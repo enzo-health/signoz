@@ -2,7 +2,6 @@
 	"name": "frontend",
 	"version": "1.0.0",
 	"description": "",
-	"main": "webpack.config.js",
 	"scripts": {
 		"i18n:generate-hash": "node ./i18-generate-hash.js",
 		"dev": "cross-env NODE_ENV=development webpack serve --progress",
