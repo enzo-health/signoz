@@ -1,0 +1,15 @@
+version: v2
+name: signoz-otel-collector
+
+services:
+- name: otel-collector
+  type: web
+  instances: 1
+  cpuCores: 1
+  ramMegabytes: 1024
+  port: 4318
+
+build:
+  context: ./deploy/porter/otel-collector
+  method: docker
+  dockerfile: Dockerfile

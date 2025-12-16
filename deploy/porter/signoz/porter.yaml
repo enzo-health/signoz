@@ -1,0 +1,21 @@
+version: v2
+name: signoz-backend
+
+services:
+- name: signoz
+  type: web
+  instances: 1
+  cpuCores: 1
+  ramMegabytes: 2048
+  port: 8080
+  env:
+    SIGNOZ_TELEMETRYSTORE_CLICKHOUSE_DSN: "tcp://signoz-clickhouse:9000"
+    SIGNOZ_SQLSTORE_SQLITE_PATH: "/var/lib/signoz/signoz.db"
+  efsStorage:
+    enabled: true
+    path: /var/lib/signoz
+
+build:
+  context: ./deploy/porter/signoz
+  method: docker
+  dockerfile: Dockerfile
