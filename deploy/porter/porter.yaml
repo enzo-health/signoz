@@ -1,0 +1,68 @@
+version: v2
+name: signoz
+
+services:
+# ZooKeeper - Coordination service
+- name: zookeeper
+  type: worker
+  instances: 1
+  cpuCores: 0.5
+  ramMegabytes: 512
+  env:
+    ZOO_SERVER_ID: "1"
+    ALLOW_ANONYMOUS_LOGIN: "yes"
+    ZOO_AUTOPURGE_INTERVAL: "1"
+  efsStorage:
+    enabled: true
+    path: /bitnami/zookeeper
+
+# ClickHouse - Time-series database
+- name: clickhouse
+  type: worker
+  instances: 1
+  cpuCores: 2
+  ramMegabytes: 4096
+  env:
+    CLICKHOUSE_SKIP_USER_SETUP: "1"
+  efsStorage:
+    enabled: true
+    path: /var/lib/clickhouse
+
+# SigNoz Query Service - Main backend + frontend UI
+- name: signoz
+  type: web
+  instances: 1
+  cpuCores: 1
+  ramMegabytes: 2048
+  port: 8080
+  env:
+    SIGNOZ_ALERTMANAGER_PROVIDER: "signoz"
+    SIGNOZ_TELEMETRYSTORE_CLICKHOUSE_DSN: "tcp://clickhouse:9000"
+    SIGNOZ_SQLSTORE_SQLITE_PATH: "/var/lib/signoz/signoz.db"
+    STORAGE: "clickhouse"
+    GODEBUG: "netdns=go"
+    TELEMETRY_ENABLED: "true"
+    DEPLOYMENT_TYPE: "porter"
+  efsStorage:
+    enabled: true
+    path: /var/lib/signoz
+
+# OTEL Collector - Telemetry ingestion (gRPC and HTTP)
+- name: otel-collector
+  type: web
+  instances: 1
+  cpuCores: 1
+  ramMegabytes: 1024
+  port: 4318
+  env:
+    OTEL_RESOURCE_ATTRIBUTES: "host.name=signoz-host,os.type=linux"
+    LOW_CARDINAL_EXCEPTION_GROUPING: "false"
+
+predeploy:
+# Schema migrator runs before main services
+- name: schema-migrator
+  run: sync --dsn=tcp://clickhouse:9000 --up=
+
+build:
+  context: .
+  method: docker

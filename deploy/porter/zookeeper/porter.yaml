@@ -1,0 +1,22 @@
+version: v2
+name: signoz-zookeeper
+
+services:
+- name: zookeeper
+  type: worker
+  instances: 1
+  cpuCores: 0.5
+  ramMegabytes: 512
+  port: 2181
+  private: true
+  env:
+    ZOO_SERVER_ID: "1"
+    ALLOW_ANONYMOUS_LOGIN: "yes"
+    ZOO_AUTOPURGE_INTERVAL: "1"
+  efsStorage:
+    enabled: true
+    path: /bitnami/zookeeper
+
+build:
+  method: docker
+  image: signoz/zookeeper:3.7.1

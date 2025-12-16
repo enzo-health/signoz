@@ -1,0 +1,21 @@
+version: v2
+name: signoz-clickhouse
+
+services:
+- name: clickhouse
+  type: worker
+  instances: 1
+  cpuCores: 2
+  ramMegabytes: 4096
+  port: 9000
+  private: true
+  env:
+    CLICKHOUSE_SKIP_USER_SETUP: "1"
+  efsStorage:
+    enabled: true
+    path: /var/lib/clickhouse
+
+build:
+  context: ./deploy/porter/clickhouse
+  method: docker
+  dockerfile: Dockerfile
