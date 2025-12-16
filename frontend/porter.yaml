@@ -1,0 +1,20 @@
+version: v2
+name: frontend
+services:
+- name: web
+  run: npx serve -s build -l $PORT
+  type: web
+  instances: 1
+  cpuCores: 0.5
+  ramMegabytes: 1000
+  terminationGracePeriodSeconds: 30
+  port: 3000
+  domains:
+  - name: web-12945-de776bb5-g02vo2kj.onporter.run
+  sleep: false
+build:
+  context: ./frontend
+  method: pack
+  builder: heroku/builder:22
+  buildpacks:
+  - heroku/nodejs
